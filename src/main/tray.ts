@@ -1,8 +1,13 @@
 import { app, Menu, Tray } from 'electron'
 import path from 'path'
+import isMainWin from './utils/isMainwin'
+import { WindowArr } from './type'
+let tray
 // 系统托盘
-const createTray = (mainWindow) => {
-  const tray = new Tray(
+const createTray = (windowArr: WindowArr[]) => {
+  const mainWindow = isMainWin(windowArr)
+  if (tray) tray.destroy()
+  tray = new Tray(
     path.resolve(
       __dirname,
       process.platform == 'darwin'

@@ -1,6 +1,9 @@
 import { Menu, MenuItemConstructorOptions } from 'electron'
+import isMainWin from './utils/isMainwin'
+import { WindowArr } from './type'
 
-const menu = (mainWindow) => {
+const menu = (windowArr: WindowArr[]) => {
+  const mainWindow = isMainWin(windowArr)
   const template = [
     // {
     //   label: '设置',

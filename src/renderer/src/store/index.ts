@@ -5,7 +5,7 @@ interface DeviceArr {
   deviceId: string
   label: string
 }
-export const useStore = defineStore('store', {
+export const useMediaDevicesStore = defineStore('MediaDevices', {
   state: () => {
     return {
       cameraArr: [] as DeviceArr[],
@@ -128,7 +128,7 @@ export const useStore = defineStore('store', {
     enabled: true,
     strategies: [
       {
-        key: 'store',
+        key: 'mediaDevices',
         storage: localStorage
       }
     ]

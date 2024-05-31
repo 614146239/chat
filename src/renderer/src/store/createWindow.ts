@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia'
-import { useStore } from './index'
-const store = useStore()
+import { useMediaDevicesStore } from './index'
+const store = useMediaDevicesStore()
 const config = store.config
 const screenWidth = screen.width
 const screenHeight = screen.height
@@ -11,6 +11,35 @@ const positionY = (height, percent) => {
   return Math.trunc(screenHeight - height - screenHeight * (percent / 100))
 }
 export const createWindow = defineStore('createWindow', () => {
+  // 登录窗口
+  const login = () => {
+    window.api.createWindow({
+      path: '/login',
+      width: 320,
+      height: 448,
+      autoHideMenuBar: true, //自动隐藏菜单栏
+      alwaysOnTop: true, //是否保持在最上层
+      frame: false, //windows去除标题栏和窗口控制按钮
+      transparent: false //窗口背景透明
+      // skipTaskbar: false
+    })
+  }
+  // 聊天窗口
+  const mainMenu = () => {
+    window.api.createWindow({
+      path: '/chatDefault',
+      width: 960,
+      height: 640,
+      isMainWin: true, //主窗口
+      autoHideMenuBar: true, //自动隐藏菜单栏
+      alwaysOnTop: false, //是否保持在最上层
+      frame: false, //windows去除标题栏和窗口控制按钮
+      transparent: false, //窗口背景透明
+      resizable: true,
+      skipTaskbar: false
+    })
+  }
+
   //创建摄像头窗口
   const cameraWindow = () => {
     window.api.createWindow({
@@ -56,8 +85,10 @@ export const createWindow = defineStore('createWindow', () => {
     })
   }
   return {
+    login,
     cameraWindow,
     recordWindow,
-    countDownWindow
+    countDownWindow,
+    mainMenu
   }
 })

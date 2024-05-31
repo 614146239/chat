@@ -28,11 +28,13 @@
     "@tensorflow-models/body-segmentation": "^1.0.1",
     "@tensorflow-models/face-landmarks-detection": "^1.0.2",
     "@tensorflow/tfjs": "^4.9.0",
+    "axios": "^1.7.2",
     "electron-updater": "^5.3.0",
     "element-plus": "^2.3.8",
     "pinia": "^2.1.4",
     "pinia-plugin-persist": "^1.0.0",
     "postcss-px-to-viewport": "^1.1.1",
+    "qs": "^6.12.1",
     "three": "^0.154.0",
     "vite-plugin-mediapipe": "^0.0.8",
     "vue-router": "^4.2.4"
@@ -73,13 +75,5 @@
       "oneClick": false,
       "allowToChangeInstallationDirectory": true
     }
-  },
-  "publish": [
-    {
-      "provider": "github",
-      "owner": "614146239",
-      "repo": "electron-camere",
-      "releaseType": "release"
-    }
-  ]
+  }
 }

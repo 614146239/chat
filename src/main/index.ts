@@ -15,58 +15,44 @@ import autoUpdate from './autoUpdater'
 // 窗口类
 import Window from './createWin'
 const window = new Window()
-
+process.env['ELECTRON_DISABLE_SECURITY_WARNINGS'] = 'true'
 function createWindow(): void {
   // 只能开启一个应用，不能多开
   const gotTheLock = app.requestSingleInstanceLock()
   if (!gotTheLock) {
     app.quit()
   }
-  // 创建浏览器窗口
+  // 创建浏览器窗口,zhu窗口
   const mainWindow = window.createWindows({
-    width: 800,
-    height: 600,
-    show: false,
+    width: 320,
+    height: 448,
+    path: '/',
     isMainWin: true,
     autoHideMenuBar: true, //自动隐藏菜单栏
-    alwaysOnTop: false, //是否保持在最上层
+    alwaysOnTop: true, //是否保持在最上层
     skipTaskbar: false, //是否在任务栏中显示窗口
-    resizable: true, //窗口是否可以改变尺寸
-    minWidth: 200,
-    titleBarStyle: 'default', //mac下隐藏导航栏
-    icon: icon,
-    ...(process.platform === 'linux' ? { icon } : {}),
-    webPreferences: {
-      preload: join(__dirname, '../preload/index.js'),
-      sandbox: false,
-      //网页功能的设置
-      // devTools: false, //是否开启 DevTools
-      webSecurity: false //是否禁用同源策略
-    }
+    resizable: false, //窗口是否可以改变尺寸
+    frame: false,
+    titleBarStyle: 'default'
   })
   window.listen()
-  // mainWindow?.webContents.openDevTools()
-  // 长宽比率为1
-  // mainWindow.setAspectRatio(1)
+
   // 创建系统托盘
-  createTray(mainWindow)
+  // createTray(window.windowArr)
+
   // 设置dock图标
   if (process.platform === 'darwin') {
     app.dock.setIcon(icon)
   }
-  //右键菜单
-  menu(mainWindow)
-  autoUpdate(mainWindow)
+  //自动更新
+  // autoUpdate(window.windowArr)
 }
-// 这段程序将会在 Electron 结束初始化
 // 和创建浏览器窗口的时候调用
 // 部分 API 在 ready 事件触发后才能使用。
 app.whenReady().then(() => {
-  // Set app user model id for windows
-  electronApp.setAppUserModelId('com.electron')
+  // 通知名称
+  electronApp.setAppUserModelId('仿qq')
   // 开发中的 F12 默认打开或关闭 DevTools
-  // 并忽略生产中的 CommandOrControl + R。
-  // see https://github.com/alex8088/electron-toolkit/tree/master/packages/utils
   app.on('browser-window-created', (_, window) => {
     optimizer.watchWindowShortcuts(window)
   })
@@ -74,13 +60,12 @@ app.whenReady().then(() => {
   createWindow()
 
   app.on('activate', function () {
-    // 通常在 macOS 上，当点击 dock 中的应用程序图标时，如果没有其他
     // 打开的窗口，那么程序会重新创建一个窗口。
     if (BrowserWindow.getAllWindows().length === 0) createWindow()
   })
 })
 
-//除了 macOS 外，当所有窗口都被关闭的时候退出程序。 因此，通常对程序和它们在
+//除了 macOS 外，当所有窗口都被关闭的时候退出程序
 // 任务栏上的图标来说，应当保持活跃状态，直到用户使用 Cmd + Q 退出。
 app.on('window-all-closed', () => {
   if (process.platform !== 'darwin') {

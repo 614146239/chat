@@ -5,10 +5,10 @@ import { electronAPI } from '@electron-toolkit/preload'
 // 渲染进程向主进程
 const api = {
   // 右键菜单
-  contextMenu: (e) => {
-    e.preventDefault()
-    ipcRenderer.send('contextMenu')
-  },
+  // contextMenu: (e) => {
+  //   e.preventDefault()
+  //   ipcRenderer.send('contextMenu')
+  // },
   // 拖动
   drag: async (opt: { x: number; y: number }, winId) => {
     await ipcRenderer.invoke('drag', opt, winId)

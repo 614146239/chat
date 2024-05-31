@@ -5,33 +5,23 @@ import {
   nativeImage,
   shell
 } from 'electron'
+import { createTray } from './tray'
+import menu from './menu'
+import icon from '../../resources/windowTray.png?asset'
 import { join } from 'path'
 // import url from 'url'
 import { is } from '@electron-toolkit/utils'
 // 录制屏幕
 import screenCapturer from './desktopCapturer '
-
-interface Config {
-  id?: string | number //唯一id
-  path?: string // 页面路由URL '/manage?id=123'
-  data?: null //数据
-  isMultiWindow?: boolean //是否支持多开窗口 (如果为false，当窗体存在，再次创建不会新建一个窗体 只focus显示即可，，如果为true，即使窗体存在，也可以新建一个)
-  isMainWin?: boolean //是否主窗口(当为true时会替代当前主窗口)
-  parentId?: string //父窗口id  创建父子窗口 -- 子窗口永远显示在父窗口顶部 【父窗口可以操作】
-  modal?: boolean //模态窗口 -- 模态窗口是禁用父窗口的子窗口，创建模态窗口必须设置 parent 和 modal 选项 【父窗口不能操作】
-}
-interface windowArr {
-  id: string | number
-  path?: string
-}
+import { WindowArr, WindowConfig } from './type'
 class Window {
   main: null
-  windowArr: windowArr[]
+  windowArr: WindowArr[]
   constructor() {
     this.main = null //当前页
     this.windowArr = [] //窗口组
   }
-  defaultConfig(): BrowserWindowConstructorOptions {
+  defaultConfig(): BrowserWindowConstructorOptions & WindowConfig {
     return {
       width: 600,
       height: 600,
@@ -39,9 +29,11 @@ class Window {
       autoHideMenuBar: true, //自动隐藏菜单栏
       alwaysOnTop: false, //是否保持在最上层
       skipTaskbar: true, //是否在任务栏中显示窗口
-      resizable: true, //窗口是否可以改变尺寸
+      resizable: false, //窗口是否可以改变尺寸
       titleBarStyle: 'default', //mac下隐藏导航栏
       maximizable: true,
+      icon: icon,
+      ...(process.platform === 'linux' ? { icon } : {}),
       webPreferences: {
         preload: join(__dirname, '../preload/index.js'),
         sandbox: false,
@@ -59,8 +51,9 @@ class Window {
   }
 
   // 创建窗口
-  createWindows(options: BrowserWindowConstructorOptions & Config) {
+  createWindows(options: BrowserWindowConstructorOptions & WindowConfig) {
     const windowConfig = Object.assign({}, this.defaultConfig(), options)
+
     // 判断窗口是否存在
     // for (const i in this.windowArr) {
     //   if (
@@ -74,17 +67,23 @@ class Window {
     // }
     for (let i = 0; i < this.windowArr.length; i++) {
       const item = this.windowArr[i]
-      if (this.getWindow(item.id) && item.path === options.path) {
-        this.getWindow(Number(item.id))?.focus()
+      // 如果重复打开窗口,让窗口聚焦
+      if (this.getWindow(item.win.id) && item?.path === options.path) {
+        this.getWindow(Number(item.config.id))?.focus()
         return
       }
     }
 
+    if (options.isMainWin) {
+      this.windowArr.forEach((el) => {
+        el.config.isMainWin = false
+      })
+    }
     const win = new BrowserWindow(windowConfig)
-    console.log('窗口id：' + win.id)
     this.windowArr.push({
       path: windowConfig.path,
-      id: win.id
+      config: windowConfig,
+      win: win
     })
 
     // win.on('close', () => win.setOpacity(0))
@@ -95,7 +94,7 @@ class Window {
       if (windowConfig.path) {
         win.loadURL(process.env['ELECTRON_RENDERER_URL'] + `#${windowConfig.path}?id=${win.id}`)
       } else {
-        win.loadURL(process.env['ELECTRON_RENDERER_URL'])
+        win.loadURL(process.env['ELECTRON_RENDERER_URL'] + `#?id=${win.id}`)
       }
     } else {
       // 加载 index.html
@@ -108,7 +107,11 @@ class Window {
       }
     }
     win.once('ready-to-show', () => {
-      win.show()
+      win.show(),
+        //系统托盘
+        createTray(this.windowArr)
+      // 右键菜单
+      // menu(this.windowArr)
     })
 
     // 当窗口被关闭时触发
@@ -140,28 +143,25 @@ class Window {
       if (winId) {
         this.getWindow(Number(winId))?.close()
         this.windowArr = this.windowArr.filter((item) => {
-          return item.id != winId
+          return item.config.id != winId
         })
       }
     })
     //无边框 窗口移动
     ipcMain.handle('drag', (_, move, winId) => {
-      if (winId) {
-        const win = this.getWindow(Number(winId))
-        const winBounds = win!.getBounds()
-        win?.setBounds({
-          x: winBounds.x + move.x,
-          y: winBounds.y + move.y,
-          width: winBounds.width,
-          height: winBounds.height
-        })
-      }
+      const win = winId ? this.getWindow(Number(winId)) : BrowserWindow.getFocusedWindow()
+      const winBounds = win!.getBounds()
+      win?.setBounds({
+        x: winBounds.x + move.x,
+        y: winBounds.y + move.y,
+        width: winBounds.width,
+        height: winBounds.height
+      })
     })
     // 窗口按比例放大缩小
     ipcMain.on('resize', (_, winId, isCircle) => {
       if (winId) {
         const win = this.getWindow(Number(winId))
-        // console.log(isCircle)
         if (isCircle) {
           win?.setAspectRatio(1)
         } else {

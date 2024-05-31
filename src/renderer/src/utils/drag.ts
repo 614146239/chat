@@ -2,6 +2,8 @@ function drag(winId: number) {
   let dragging = false
   let startCoords = { x: 0, y: 0 }
   window.addEventListener('mousedown', (event) => {
+    console.log(11111)
+
     dragging = true
     startCoords = { x: event.screenX, y: event.screenY }
   })
@@ -13,6 +15,8 @@ function drag(winId: number) {
         x: event.screenX - startCoords.x,
         y: event.screenY - startCoords.y
       }
+
+      console.log(move)
 
       window.api.drag(move, winId)
       startCoords = newCoords

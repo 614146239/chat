@@ -25,7 +25,7 @@
 
 <script setup lang="ts">
 import { useStore } from '../store/index'
-import { ref } from 'vue';
+import { ref } from 'vue'
 import { useBroadcastChannel } from '@vueuse/core'
 const store = useStore()
 const faceModelConfig = store.faceModelConfig
@@ -58,6 +58,8 @@ const { post } = useBroadcastChannel({
 const choose = (item: { path: string }): void => {
   choice.value = item.path
   faceModelConfig.modelUrl = item.path
+  console.log(item.path)
+
   post(JSON.stringify(faceModelConfig))
 }
 const changeModel = (bool): void => {

@@ -1,0 +1,135 @@
+.chat {
+  width: 100%;
+  height: 100vh;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  background-color: rgb(242, 242, 242);
+}
+.border {
+  width: 100%;
+  height: 1px;
+  background-color: grey;
+  transform: scaleY(0.2);
+}
+header {
+  width: 100%;
+  height: 65px;
+  position: relative;
+  z-index: 999;
+  .close {
+    width: 30px;
+    height: 30px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: absolute;
+    top: 0px;
+    right: 0px;
+    font-size: 22px;
+    line-height: 1;
+  }
+  .name {
+    position: absolute;
+    bottom: 10px;
+    margin-left: 20px;
+    display: flex;
+    align-items: center;
+    p {
+      display: block;
+      font-size: 16px;
+      margin-right: 10px;
+    }
+    .isOnline {
+      width: 15px;
+      height: 15px;
+      border-radius: 50%;
+      background-color: rgb(79, 221, 79);
+    }
+  }
+}
+
+.messageList {
+  padding: 20px 20px 0px 20px;
+  width: 100%;
+  height: 370px;
+  overflow-y: auto;
+  position: relative;
+  .opponentMsg {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    margin-bottom: 20px;
+    .avatar {
+      margin-right: 10px;
+    }
+  }
+  .time {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    color: grey;
+    font-size: 12px;
+    margin-bottom: 20px;
+  }
+  .selfMsg {
+    width: 100%;
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    margin-bottom: 20px;
+    p {
+      margin-right: 10px;
+    }
+  }
+}
+.upload {
+  width: 100%;
+  height: 100%;
+  position: absolute;
+  top: 0;
+  // display: none;
+}
+.inputChat {
+  width: 100%;
+  flex: 1;
+  position: relative;
+  .writeMsg {
+    width: 100%;
+    height: 100%;
+    .el-textarea {
+      height: 100%;
+      height: 100%;
+
+      background-color: rgb(242, 242, 242);
+      :deep(.el-textarea__inner) {
+        height: 100% !important;
+        background-color: rgb(242, 242, 242);
+        font-size: 15px;
+        color: #000;
+        &::-webkit-hover {
+          box-shadow: none;
+        }
+        &::-webkit-scrollbar {
+          width: 5px;
+          height: 100%;
+          background: rgb(242, 242, 242); // 滑块颜色
+          border-radius: 5px; // 滑块圆角
+        }
+        &::-webkit-scrollbar-thumb {
+          height: 10px;
+          border-radius: 5px; // 滑块圆角
+          background-color: rgb(167, 159, 159);
+        }
+        &:focus {
+          box-shadow: none;
+        }
+      }
+    }
+  }
+  .submit {
+    position: absolute;
+    bottom: 20px;
+    right: 20px;
+  }
+}
