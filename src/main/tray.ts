@@ -41,6 +41,7 @@ const createTray = (windowArr: WindowArr[]) => {
     {
       label: '退出程序',
       click: () => {
+        // mainWindow.webContents.send('logout')
         app.exit()
       }
     }

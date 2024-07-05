@@ -8,7 +8,7 @@
       router
       unique-opened
       active-text-color="rgb(0,153,255)"
-      background-color="rgb(204,205,205)"
+      background-color="rgb(236,236,236)"
       default-active="/chatList"
       class="menuList"
     >
@@ -23,32 +23,64 @@
         </div>
       </el-menu-item>
     </el-menu>
+
+    <el-menu
+      class="setting"
+      unique-opened
+      active-text-color="rgb(0,153,255)"
+      background-color="rgb(236,236,236)"
+      default-active="/chatList"
+    >
+      <el-menu-item
+        v-for="item in settingList"
+        :key="item.icon"
+        class="menuItem"
+        :index="String(item.icon)"
+      >
+        <div class="menuitem">
+          <el-icon size="50"> <component :is="item.icon" /></el-icon>
+        </div>
+      </el-menu-item>
+    </el-menu>
   </div>
 </template>
 
 <script setup lang="ts">
 import useDrag from '../../hooks/useDrag'
-import useCloseWindow from '../../hooks/useCloseWindow'
+import socket from '../../websocket/index'
+import { useUserStore } from '../../store/user'
+const userStore = useUserStore()
+const userList = ref(userStore.userList)
+const userInfo = userStore.userInfo
+socket.connect()
+userList.value.map((item) => {
+  const room = userStore.createRoom(item.id, userInfo.id)
+  socket.emit('join_room', room)
+})
 
+userStore.getFriends()
 const menuList = ref([
   {
     path: '/chatList',
-    icon: 'Comment'
+    icon: 'ChatDotRound'
   },
   {
     path: '/chatFriends',
-    icon: 'Avatar'
+    icon: 'User'
+  }
+])
+const settingList = ref([
+  {
+    icon: 'Tools'
   }
 ])
 const dragRef = ref()
-let clearDrag: () => void
+let clearDrag
 onMounted(() => {
   clearDrag = useDrag(dragRef.value)
 })
-
 onBeforeUnmount(() => {
   clearDrag()
-  console.log('失效')
 })
 </script>
 

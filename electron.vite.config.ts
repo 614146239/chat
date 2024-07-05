@@ -41,6 +41,15 @@ export default defineConfig({
       Components({
         resolvers: [ElementPlusResolver()]
       })
-    ]
+    ],
+    server: {
+      // proxy: {
+      //   '/api': {
+      //     target: 'http://localhost:8080',
+      //     changeOrigin: true,
+      //     ws: true
+      //   }
+      // }
+    }
   }
 })

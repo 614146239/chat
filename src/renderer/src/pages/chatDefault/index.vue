@@ -1,17 +1,19 @@
 <template>
   <div class="chat">
-    <header>
-      <div class="close" @click="close">x</div>
-    </header>
+    <header ref="headerRef" class="head"></header>
   </div>
 </template>
 
 <script setup lang="ts">
-import useCloseWindow from '../../hooks/useCloseWindow'
-
-const close = (): void => {
-  useCloseWindow()
-}
+import useDrag from '../../hooks/useDrag'
+const headerRef = ref()
+let clearDrag
+onMounted(() => {
+  clearDrag = useDrag(headerRef.value)
+})
+onBeforeUnmount(() => {
+  clearDrag()
+})
 </script>
 
 <style scoped lang="less">

@@ -8,8 +8,9 @@ import axios, {
 import { ElMessage } from 'element-plus'
 import { ResultData } from './interface/index'
 import { AxiosCanceler } from './helper/axiosCancel'
-import router from '../router/index'
-
+import { useUserStore } from '@renderer/store/user'
+import { createWindow } from '@renderer/store/createWindow'
+const win = createWindow()
 export interface CustomAxiosRequestConfig extends InternalAxiosRequestConfig {
   // loading?: boolean
   cancel?: boolean
@@ -17,7 +18,9 @@ export interface CustomAxiosRequestConfig extends InternalAxiosRequestConfig {
 
 const config = {
   // 默认地址请求地址，可在 .env.** 文件中修改
-  baseURL: import.meta.env.VITE_API_URL as string
+  baseURL: 'http://121.40.116.209:80'
+  // baseURL: 'http://localhost:8080'
+
   // 设置超时时间
   // timeout: ResultEnum.TIMEOUT as number
   // 跨域时候允许携带凭证
@@ -38,13 +41,14 @@ class RequestHttp {
      */
     this.service.interceptors.request.use(
       (config: CustomAxiosRequestConfig) => {
-        // const userStore = useUserStore()
+        const userStore = useUserStore()
+
         // 重复请求不需要取消，在 api 服务中通过指定的第三个参数: { cancel: false } 来控制
-        // config.cancel ?? (config.cancel = true)
-        // config.cancel && axiosCanceler.addPending(config)
-        // if (config.headers && typeof config.headers.set === 'function') {
-        //   config.headers.set('x-access-token', userStore.token)
-        // }
+        config.cancel ?? (config.cancel = true)
+        config.cancel && axiosCanceler.addPending(config)
+        if (config.headers && typeof config.headers.set === 'function') {
+          config.headers.set('x-access-token', userStore.token)
+        }
         return config
       },
       (error: AxiosError) => {
@@ -59,8 +63,8 @@ class RequestHttp {
     this.service.interceptors.response.use(
       (response: AxiosResponse) => {
         const { data, config } = response
-        // const userStore = useUserStore()
-        // axiosCanceler.removePending(config)
+        const userStore = useUserStore()
+        axiosCanceler.removePending(config)
         // // 登录失效
         // if (data.code == ResultEnum.OVERDUE) {
         //   userStore.setToken('')
@@ -78,13 +82,18 @@ class RequestHttp {
       },
       async (error: AxiosError) => {
         const { response } = error
+        if (response?.status === 401) {
+          window.close()
+          win.login()
+        }
+
         // 请求超时 && 网络错误单独判断，没有 response
         if (error.message.indexOf('timeout') !== -1) ElMessage.error('请求超时！请您稍后重试')
         if (error.message.indexOf('Network Error') !== -1) ElMessage.error('网络错误！请您稍后重试')
         // 根据服务器响应的错误状态码，做不同的处理
         // if (response) checkStatus(response.status)
         // 服务器结果都没有返回(可能服务器错误可能客户端断网)，断网处理:可以跳转到断网页面
-        if (!window.navigator.onLine) router.replace('/500')
+        // if (!window.navigator.onLine) router.replace('/500')
         return Promise.reject(error)
       }
     )

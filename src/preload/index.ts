@@ -10,8 +10,9 @@ const api = {
   //   ipcRenderer.send('contextMenu')
   // },
   // 拖动
-  drag: async (opt: { x: number; y: number }, winId) => {
-    await ipcRenderer.invoke('drag', opt, winId)
+  drag: async (opt: { x: number; y: number }) => {
+    // invoke 同步等待结果返回，执行下一步
+    await ipcRenderer.invoke('drag', opt)
   },
   // 录制
   recording: () => {
@@ -20,6 +21,7 @@ const api = {
 
   // 创建窗口
   createWindow: (args) => {
+    // send异步
     ipcRenderer.send('createWindow', args)
   },
   // 关闭窗口
@@ -29,11 +31,23 @@ const api = {
   resize: (winId: number, isCircle: boolean) => {
     ipcRenderer.send('resize', winId, isCircle)
   },
-  changeShape: (winId, width, isCircle) => {
-    ipcRenderer.send('changeShape', winId, width, isCircle)
+  changeShape: (w, h) => {
+    ipcRenderer.send('changeShape', w, h)
   },
-  setFullScreen: (winId, isFullScreen) => {
-    ipcRenderer.send('setFullScreen', winId, isFullScreen)
+  setFullScreen: (isFullScreen) => {
+    ipcRenderer.send('setFullScreen', isFullScreen)
+  },
+  miniMize: () => {
+    ipcRenderer.send('minimize')
+  },
+  setInfo: async (key, value) => {
+    await ipcRenderer.invoke('setInfo', key, value)
+  },
+  getInfo: (key) => {
+    return ipcRenderer.sendSync('getInfo', key)
+  },
+  openFolder: async () => {
+    return await ipcRenderer.invoke('open-folder-dialog')
   }
 }
 // 主进程向渲染进程
@@ -46,6 +60,10 @@ const electron = {
   downloadProgress: (callback) => {
     ipcRenderer.on('downloadProgress', callback)
   }
+  // 退出登录
+  // logout: (callback) => {
+  //   ipcRenderer.invoke('logout', callback)
+  // }
 }
 
 // 使用“contextBridge”API仅在启用上下文隔离时才向渲染器公开Electron API，

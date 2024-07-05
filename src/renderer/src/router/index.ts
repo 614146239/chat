@@ -20,11 +20,16 @@ const routes: Array<RouteRecordRaw> = [
         component: () => import('../pages/chatList/index.vue'),
         children: [
           {
+            path: '',
+            name: 'chatDefault',
+            component: () => import('../pages/chatDefault/index.vue')
+          },
+          {
             path: '/chatDefault',
             component: () => import('../pages/chatDefault/index.vue')
           },
           {
-            path: '/chat/:id',
+            path: '/chat',
             name: 'chat',
             component: () => import('../pages/chat/index.vue')
           }
@@ -33,9 +38,46 @@ const routes: Array<RouteRecordRaw> = [
       {
         path: '/chatFriends',
         name: 'chatFriends',
-        component: () => import('../pages/chatFriends/index.vue')
+        component: () => import('../pages/chatFriends/index.vue'),
+        children: [
+          {
+            path: '',
+            name: 'chatDefault',
+            component: () => import('../pages/chatDefault/index.vue')
+          },
+          {
+            path: '/friendNotice',
+            name: 'friendNotice',
+            component: () => import('../pages/friendNotice/index.vue')
+          }
+
+          // {
+          //   path: '/chatDefault',
+          //   component: () => import('../pages/chatDefault/index.vue')
+          // },
+          // {
+          //   path: '/chat/:id',
+          //   name: 'chat',
+          //   component: () => import('../pages/chat/index.vue')
+          // }
+        ]
       }
     ]
+  },
+  {
+    path: '/searchFriend',
+    name: 'searchFriend',
+    component: () => import('../pages/searchFriend/index.vue')
+  },
+  {
+    path: '/addFriend/:friendInfo',
+    name: 'addFriend',
+    component: () => import('../pages/addFriend/index.vue')
+  },
+  {
+    path: '/videoChat/:room/:isPhone',
+    name: 'videoChat',
+    component: () => import('../pages/videoChat/index.vue')
   }
   // {
   //   path: '/setting',

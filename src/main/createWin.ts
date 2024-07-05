@@ -1,6 +1,7 @@
 import {
   BrowserWindow,
   BrowserWindowConstructorOptions,
+  dialog,
   ipcMain,
   nativeImage,
   shell
@@ -9,11 +10,15 @@ import { createTray } from './tray'
 import menu from './menu'
 import icon from '../../resources/windowTray.png?asset'
 import { join } from 'path'
+
 // import url from 'url'
 import { is } from '@electron-toolkit/utils'
+
+import { setInfo, getInfo, deleteInfo, clearInfo } from './store'
 // 录制屏幕
 import screenCapturer from './desktopCapturer '
 import { WindowArr, WindowConfig } from './type'
+import { getFile, openFile } from './utils/file'
 class Window {
   main: null
   windowArr: WindowArr[]
@@ -35,7 +40,7 @@ class Window {
       icon: icon,
       ...(process.platform === 'linux' ? { icon } : {}),
       webPreferences: {
-        preload: join(__dirname, '../preload/index.js'),
+        preload: join(__dirname, '../preload/index.mjs'),
         sandbox: false,
         webSecurity: false //是否禁用同源策略
       }
@@ -53,23 +58,12 @@ class Window {
   // 创建窗口
   createWindows(options: BrowserWindowConstructorOptions & WindowConfig) {
     const windowConfig = Object.assign({}, this.defaultConfig(), options)
-
-    // 判断窗口是否存在
-    // for (const i in this.windowArr) {
-    //   if (
-    //     this.getWindow(Number(i)) &&
-    //     this.windowArr[i].path === windowConfig.path &&
-    //     !windowConfig.isMultiWindow
-    //   ) {
-    //     this.getWindow(Number(i)).focus()
-    //     return
-    //   }
-    // }
     for (let i = 0; i < this.windowArr.length; i++) {
       const item = this.windowArr[i]
       // 如果重复打开窗口,让窗口聚焦
       if (this.getWindow(item.win.id) && item?.path === options.path) {
-        this.getWindow(Number(item.config.id))?.focus()
+        // item.win.show()
+        item.win.showInactive()
         return
       }
     }
@@ -116,6 +110,8 @@ class Window {
 
     // 当窗口被关闭时触发
     win.on('close', (event) => {
+      const winArr = this.getAllWindows()
+      this.windowArr = this.windowArr.filter((item) => winArr.some((win) => win.id === item.win.id))
       if (windowConfig.isMainWin) {
         // 阻止默认行为
         event.preventDefault()
@@ -139,17 +135,16 @@ class Window {
       this.createWindows(args)
     })
     // 关闭窗口
-    ipcMain.on('closeWindow', (_, winId) => {
-      if (winId) {
-        this.getWindow(Number(winId))?.close()
-        this.windowArr = this.windowArr.filter((item) => {
-          return item.config.id != winId
-        })
-      }
+    ipcMain.on('closeWindow', () => {
+      const win = BrowserWindow.getFocusedWindow()
+      win?.close()
+      this.windowArr = this.windowArr.filter((item) => {
+        return item.config.id != win?.id
+      })
     })
     //无边框 窗口移动
-    ipcMain.handle('drag', (_, move, winId) => {
-      const win = winId ? this.getWindow(Number(winId)) : BrowserWindow.getFocusedWindow()
+    ipcMain.handle('drag', (_, move) => {
+      const win = BrowserWindow.getFocusedWindow()
       const winBounds = win!.getBounds()
       win?.setBounds({
         x: winBounds.x + move.x,
@@ -170,26 +165,41 @@ class Window {
       }
     })
     // 切换窗口形态
-    ipcMain.on('changeShape', (_, winId, width, isCircle) => {
-      if (winId) {
-        const win = this.getWindow(Number(winId))
-        if (isCircle) {
-          win?.setSize(width, width)
-        } else {
-          // 长边
-          // win?.setSize(width, (width * 3) / 4)
-          // 短边
-          win?.setSize(Math.trunc((width * 4) / 3), width)
-        }
+    ipcMain.on('changeShape', (_, width, height) => {
+      const win = BrowserWindow.getFocusedWindow()
+      if (height == undefined) {
+        const [w, h] = win?.getSize()
+        height = h
       }
+      win?.setSize(width, height)
     })
     // 窗口全屏
-    ipcMain.on('setFullScreen', (_, winId, isFullScreen) => {
-      if (winId) {
-        const win = this.getWindow(Number(winId))
-        win?.setAspectRatio(0)
-        win?.setFullScreen(isFullScreen)
+    ipcMain.on('setFullScreen', (_, isFullScreen) => {
+      const win = BrowserWindow.getFocusedWindow()
+      win?.setAspectRatio(0)
+      win?.setFullScreen(isFullScreen)
+    })
+    // 最小化任务栏
+    ipcMain.on('minimize', () => {
+      const win = BrowserWindow.getFocusedWindow()
+      win?.minimize()
+    })
+    // 存储消息
+    ipcMain.handle('setInfo', setInfo)
+    ipcMain.on('getInfo', getInfo)
+    // 打开文件夹
+    ipcMain.handle('open-folder-dialog', async () => {
+      const result = await dialog.showOpenDialog({
+        properties: ['openFile'],
+        filters: [
+          // { name: 'Images', extensions: ['jpg', 'jpeg', 'png', 'gif'] },
+          { name: 'All Files', extensions: ['*'] } // 添加 '*' 允许选择任何文件
+        ]
+      })
+      if (result.canceled) {
+        return null // 用户取消选择
       }
+      return getFile(result.filePaths[0])
     })
   }
 }

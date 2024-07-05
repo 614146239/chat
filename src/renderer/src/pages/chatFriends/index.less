@@ -1,11 +1,24 @@
 .box {
-  // width: 100%;
+  width: 260px;
   height: 100vh;
   background-color: #fff;
+  :deep(.el-collapse-item__header) {
+    padding-left: 10px;
+    font-size: 16px;
+    color: #000;
+    // font-weight: bold;
+  }
+  :deep(.el-collapse-item__content) {
+    padding-bottom: 0px;
+  }
+  .collapseItem {
+    display: flex;
+    align-items: center;
+    font-size: 14px;
+  }
+
   .chatList {
-    // width: 100%;
-    width: 260px;
-    overflow-y: auto;
+    width: 100%;
     .chatItem {
       width: 100%;
       padding: 10px;
@@ -29,8 +42,8 @@
           display: flex;
           justify-content: space-between;
           margin-bottom: 5px;
-          .username {
-            font-size: 18px;
+          .userName {
+            font-size: 14px;
             overflow: hidden;
             text-overflow: ellipsis;
             white-space: nowrap;
@@ -49,6 +62,23 @@
           white-space: nowrap;
         }
       }
+    }
+  }
+}
+
+.notice {
+  width: 100%;
+  padding: 0px 10px;
+  .noticeItem {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    height: 40px;
+    &:hover {
+      background-color: rgb(245, 245, 245);
+    }
+    p {
+      font-size: 14px;
     }
   }
 }

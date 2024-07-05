@@ -1,15 +1,14 @@
-import router from '../router/index'
-
+import { onBeforeUnmount } from 'vue'
 // 窗口拖动
 function useDrag(node?: HTMLElement): (() => void) | undefined {
-  const route = router.currentRoute.value
-  const dragElement = node || window // 如果node未传入，则使用window
-
+  const dragElement = node // 如果node未传入，则使用window
   let dragging = false
   let startCoords = { x: 0, y: 0 }
 
   const handleMouseDown = (event: MouseEvent) => {
-    if (dragElement === window || event.target === node) {
+    if (event.target === node) {
+      event.stopPropagation() // 阻止冒泡
+      event.preventDefault()
       dragging = true
       startCoords = { x: event.screenX, y: event.screenY }
     }
@@ -22,7 +21,7 @@ function useDrag(node?: HTMLElement): (() => void) | undefined {
         x: event.screenX - startCoords.x,
         y: event.screenY - startCoords.y
       }
-      window.api.drag(move, Number(route.query.id))
+      window.api.drag(move)
       startCoords = newCoords
     }
   }
@@ -31,14 +30,19 @@ function useDrag(node?: HTMLElement): (() => void) | undefined {
     dragging = false
   }
 
-  // 绑定事件
-  dragElement.addEventListener('mousedown', handleMouseDown)
+  dragElement?.addEventListener('mousedown', handleMouseDown, true)
   window.addEventListener('mousemove', handleMouseMove)
   window.addEventListener('mouseup', handleMouseUp)
 
+  onBeforeUnmount(() => {
+    dragElement?.removeEventListener('mousedown', handleMouseDown)
+    window.removeEventListener('mousemove', handleMouseMove)
+    window.removeEventListener('mouseup', handleMouseUp)
+  })
+
   // 返回一个清理函数
   return (): void => {
-    dragElement.removeEventListener('mousedown', handleMouseDown)
+    dragElement?.removeEventListener('mousedown', handleMouseDown)
     window.removeEventListener('mousemove', handleMouseMove)
     window.removeEventListener('mouseup', handleMouseUp)
   }

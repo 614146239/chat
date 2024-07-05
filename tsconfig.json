@@ -3,6 +3,7 @@
   "references": [{ "path": "./tsconfig.node.json" }, { "path": "./tsconfig.web.json" }],
   "compilerOptions": {
     "types": ["element-plus/global"],
+    "baseUrl": "./",
   },
   "include": [
     "src/**/*.ts",
@@ -11,5 +12,5 @@
     "src/preload/index.d.ts",
     "auto-imports.d.ts", // 此处引入该声明文件
   ],
-  "baseUrl": "./",
+
 }

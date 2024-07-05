@@ -10,15 +10,6 @@ export const useMediaDevicesStore = defineStore('MediaDevices', {
     return {
       cameraArr: [] as DeviceArr[],
       audioArr: [] as DeviceArr[],
-      config: {
-        borderWidth: 1,
-        borderColor: '',
-        reverse: true,
-        isRecording: false,
-        isWebcam: false,
-        isCircle: true,
-        isFullScreen: false
-      },
       faceModelConfig: {
         modelUrl: '',
         isFaceModel: false
@@ -118,19 +109,7 @@ export const useMediaDevicesStore = defineStore('MediaDevices', {
             type: 'error'
           })
         })
-    },
-    // 关闭窗口
-    closeWindow(winId) {
-      window.api.closeWindow(winId)
     }
   },
-  persist: {
-    enabled: true,
-    strategies: [
-      {
-        key: 'mediaDevices',
-        storage: localStorage
-      }
-    ]
-  }
+  persist: true
 })

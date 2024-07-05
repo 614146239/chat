@@ -1,6 +1,5 @@
 // 控制应用生命周期和创建原生浏览器窗口的模组
 import { app, BrowserWindow } from 'electron'
-import { join } from 'path'
 import { electronApp, optimizer } from '@electron-toolkit/utils'
 import icon from '../../resources/windowTray.png?asset'
 
@@ -18,11 +17,12 @@ const window = new Window()
 process.env['ELECTRON_DISABLE_SECURITY_WARNINGS'] = 'true'
 function createWindow(): void {
   // 只能开启一个应用，不能多开
-  const gotTheLock = app.requestSingleInstanceLock()
-  if (!gotTheLock) {
-    app.quit()
-  }
+  // const gotTheLock = app.requestSingleInstanceLock()
+  // if (!gotTheLock) {
+  //   app.quit()
+  // }
   // 创建浏览器窗口,zhu窗口
+
   const mainWindow = window.createWindows({
     width: 320,
     height: 448,

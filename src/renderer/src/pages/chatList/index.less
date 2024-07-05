@@ -1,11 +1,21 @@
 .box {
   // width: 100%;
+  width: 260px;
   height: 100vh;
   background-color: #fff;
+  .search {
+    padding: 0px 10px;
+    :deep(.el-input__wrapper) {
+      background-color: rgb(245, 245, 245);
+    }
+  }
   .chatList {
     // width: 100%;
     width: 260px;
     overflow-y: auto;
+    .chatItemActive {
+      background-color: rgb(245, 245, 245);
+    }
     .chatItem {
       width: 100%;
       padding: 10px;
@@ -43,10 +53,19 @@
           }
         }
         .info {
-          font-size: 12px;
-          overflow: hidden;
-          text-overflow: ellipsis;
-          white-space: nowrap;
+          margin-top: 10px;
+          display: flex;
+          p {
+            font-size: 12px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+          }
+          span {
+            display: block;
+            width: 10px;
+            height: 10px;
+          }
         }
       }
     }

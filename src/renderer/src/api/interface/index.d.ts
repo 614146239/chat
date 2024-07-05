@@ -6,6 +6,7 @@ export interface Result {
 
 // 请求响应参数（包含data）
 export interface ResultData<T = any> extends Result {
+  token(token: string): unknown
   data: T
 }
 
@@ -37,7 +38,7 @@ export namespace Login {
     password: string
   }
   export interface ResLogin {
-    access_token: string
+    token: string
   }
   export interface ResAuthButtons {
     [key: string]: string[]
