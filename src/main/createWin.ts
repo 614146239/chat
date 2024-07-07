@@ -152,6 +152,8 @@ class Window {
         width: winBounds.width,
         height: winBounds.height
       })
+      const [width, height] = win?.getContentSize()
+      win?.setSize(width, height)
     })
     // 窗口按比例放大缩小
     ipcMain.on('resize', (_, winId, isCircle) => {
