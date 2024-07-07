@@ -19,7 +19,7 @@
             <div class="time">{{ item.time }}</div>
           </div>
           <div class="info">
-            <p>{{ item.message.at(-1).msg }}</p>
+            <p>{{ item.message && item.message.length ? item.message.at(-1).msg : null }}</p>
             <el-badge v-if="item.msgTotal" :value="item.msgTotal"> <span></span> </el-badge>
           </div>
         </div>
