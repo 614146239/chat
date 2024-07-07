@@ -100,10 +100,13 @@ const userStore = useUserStore()
 const friendId = ref(route.query.friendId)
 const room = ref(route.query.room)
 const userInfo = userStore.userInfo
-const friendInfo = ref(userStore.findUser(friendId.value))
+const friendInfo = ref(userStore.findChatUser(friendId.value))
 const headerRef = ref()
 const msg = ref('')
-const messageList = ref([])
+// const messageList = ref([])
+const messageList = ref(friendInfo.message ? friendInfo.message : reactive([]))
+console.log(messageList)
+
 const isSendFile = ref(false)
 userStore.clearMsgTotal(friendId.value)
 watch(
@@ -119,13 +122,10 @@ watch(
 )
 
 socket.connect()
-// socket.on('receive_message', (msg) => {
-//   messageList.value.push({
-//     class: 'opponentMsg',
-//     msg: msg,
-//     userInfo: friendInfo
-//   })
-// })
+socket.on('receive_message', (msg) => {
+  friendInfo.value = userStore.findChatUser(friendId.value)
+  messageList.value = friendInfo.value.message
+})
 let fileInfo = reactive({
   size: '',
   fileName: '',
@@ -144,7 +144,7 @@ const openFolder = async () => {
   console.log(fileInfo)
 }
 const sendFile = () => {
-  const newFile = new File([fileInfo.file], fileInfo.fileName)
+  const newFile = new File([fileInfo.file], fileInfo.fileName, { type: 'application/octet-stream' })
 
   const formData = new FormData()
   // formData.append('file', new Blob([fileInfo.file]))
@@ -165,11 +165,14 @@ const send = async (): Promise<void> => {
       userInfo: toRaw(userInfo)
     })
   )
-  messageList.value.push({
-    class: 'selfMsg',
-    msg: msg.value,
-    userInfo: userInfo
-  })
+  messageList.value = [
+    ...messageList.value,
+    {
+      class: 'selfMsg',
+      msg: msg.value,
+      userInfo: userInfo
+    }
+  ]
   msg.value = ''
 }
 const videoCamera = () => {

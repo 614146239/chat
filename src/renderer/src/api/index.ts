@@ -18,8 +18,8 @@ export interface CustomAxiosRequestConfig extends InternalAxiosRequestConfig {
 
 const config = {
   // 默认地址请求地址，可在 .env.** 文件中修改
-  baseURL: 'http://121.40.116.209:80'
-  // baseURL: 'http://localhost:8080'
+  // baseURL: 'http://121.40.116.209:80'
+  baseURL: 'http://localhost:8080'
 
   // 设置超时时间
   // timeout: ResultEnum.TIMEOUT as number

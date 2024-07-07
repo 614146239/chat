@@ -31,6 +31,11 @@ export const useUserStore = defineStore('user', {
         return state.userList.find((user) => user.id == id)
       }
     },
+    findChatUser(state) {
+      return (id) => {
+        return state.chatList.find((user) => user.id == id)
+      }
+    },
     clearMsgTotal(state) {
       return (id) => {
         state.chatList.forEach((user) => {
@@ -57,6 +62,9 @@ export const useUserStore = defineStore('user', {
     }
   },
   persist: true
+  // persist: {
+  //   storage: sessionStorage
+  // }
 })
 
 const splitUser = (groupAndUser) => {

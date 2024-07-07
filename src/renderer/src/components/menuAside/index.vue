@@ -55,6 +55,7 @@ const userInfo = userStore.userInfo
 socket.connect()
 userList.value.map((item) => {
   const room = userStore.createRoom(item.id, userInfo.id)
+  item.room = room
   socket.emit('join_room', room)
 })
 

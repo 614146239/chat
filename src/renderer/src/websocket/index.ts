@@ -3,10 +3,11 @@ import { useUserStore } from '@renderer/store/user'
 const userStore = useUserStore()
 import { createWindow } from '@renderer/store/createWindow'
 const win = createWindow()
-// const URL = 'http://localhost:8080'
-const URL = 'http://121.40.116.209'
+const URL = 'http://localhost:8080'
+// const URL = 'http://121.40.116.209:80'
 
 import tone from './preview.mp3'
+import { reactive } from 'vue'
 
 const audio = new Audio(tone)
 
@@ -25,19 +26,23 @@ socket.on('connect', () => {
   console.log('connected:', socket.id)
 })
 // 接收消息
+const msgList = []
 socket.on('receive_message', (msg) => {
   audio.play()
   const message = JSON.parse(msg)
   const friendId = message.userInfo.id
   const hasUser = userStore.chatList.some((user) => user.id == friendId)
+  const friend = userStore.findUser(friendId)
   if (!hasUser) {
-    const friend = userStore.findUser(friendId)
     if (friend) {
       userStore.chatList.unshift(friend)
     }
   }
   userStore.chatList.forEach((user) => {
     if (user.id == friendId) {
+      user.message = user.message ? user.message : reactive([])
+      user.message.push(message)
+
       const msgTotal = user.msgTotal ?? 0
       user.msgTotal = msgTotal + 1
     }
