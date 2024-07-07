@@ -13,13 +13,16 @@ function useDrag(node?: HTMLElement): (() => void) | undefined {
       startCoords = { x: event.screenX, y: event.screenY }
     }
   }
-
+  const width = window.outerWidth
+  const height = window.outerHeight
   const handleMouseMove = (event: MouseEvent) => {
     if (dragging) {
       const newCoords = { x: event.screenX, y: event.screenY }
       const move = {
         x: event.screenX - startCoords.x,
-        y: event.screenY - startCoords.y
+        y: event.screenY - startCoords.y,
+        width: width,
+        height: height
       }
       window.api.drag(move)
       startCoords = newCoords

@@ -149,11 +149,9 @@ class Window {
       win?.setBounds({
         x: winBounds.x + move.x,
         y: winBounds.y + move.y,
-        width: winBounds.width,
-        height: winBounds.height
+        width: move.width,
+        height: move.height
       })
-      const [width, height] = win?.getContentSize()
-      win?.setSize(width, height)
     })
     // 窗口按比例放大缩小
     ipcMain.on('resize', (_, winId, isCircle) => {
