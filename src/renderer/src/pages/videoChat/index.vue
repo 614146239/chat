@@ -116,8 +116,8 @@ const isCloseViseo = () => {
 const call = () => {
   try {
     offerPeer.value = new webRTC()
-    offerPeer.value.peer.addTransceiver('video', { direction: 'sendrecv' })
     offerPeer.value.peer.addTransceiver('audio', { direction: 'sendrecv' })
+    offerPeer.value.peer.addTransceiver('video', { direction: 'sendrecv' })
     offerPeer.value.onicecandidate().then((ice: RTCIceCandidate) => {
       // 收集ice,并发送;
       socket.emit('sendIce', room, JSON.stringify(ice))
@@ -142,8 +142,6 @@ const call = () => {
       friendVideo.value.srcObject = offerStream
     }
     stream.value.getTracks().forEach(async (track) => {
-      console.log(track)
-
       await offerPeer.value.peer.addTrack(track, stream.value)
     })
     //  60秒后自动挂断
@@ -197,6 +195,9 @@ onMounted(async () => {
   })
   console.log(stream.value)
   selfVideo.value.srcObject = stream.value
+})
+onBeforeUnmount(() => {
+  window.close()
 })
 </script>
 

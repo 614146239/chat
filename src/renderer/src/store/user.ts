@@ -9,8 +9,8 @@ export const useUserStore = defineStore('user', {
       userList: [], //用户列表
       userGroup: [], //用户组列表
       groupAndUser: [], //用户组和用户列表
-      chatList: [], //聊天列表
-      chatMsg: [] //
+      chatList: [] //聊天列表
+      // chatMsg: [] //
     }
   },
 
@@ -61,10 +61,11 @@ export const useUserStore = defineStore('user', {
       this.userGroup = [...groupList]
     }
   },
-  persist: true
-  // persist: {
-  //   storage: sessionStorage
-  // }
+  // persist: true
+  persist: {
+    // storage: sessionStorage
+    paths: ['userInfo', 'token', 'userGroup', 'groupAndUser']
+  }
 })
 
 const splitUser = (groupAndUser) => {

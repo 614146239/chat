@@ -4,8 +4,8 @@ const userStore = useUserStore()
 import { createWindow } from '@renderer/store/createWindow'
 const win = createWindow()
 // const URL = 'http://localhost:8080'
-const URL = 'http://121.40.116.209:80'
-
+// const URL = 'http://121.40.116.209:80'
+const URL = import.meta.env.VITE_BASE_API
 import tone from './preview.mp3'
 import { reactive } from 'vue'
 
