@@ -47,7 +47,6 @@ import Search from '../../components/search/index.vue'
 const userStore = useUserStore()
 const router = useRouter()
 const userInfo = userStore.userInfo
-
 const list = ref(userStore.groupAndUser)
 
 const href = (item): void => {
@@ -56,6 +55,11 @@ const href = (item): void => {
   if (!hasUser) {
     userStore.chatList.unshift(item)
   }
+  const index = userStore.chatList.findIndex((user) => user.id === item.id)
+  // 从数组中移除该用户
+  const [userToRemove] = userStore.chatList.splice(index, 1)
+  // 然后将用户添加到数组的最前面
+  userStore.chatList.unshift(userToRemove)
   router.push({
     name: `chat`,
     query: {

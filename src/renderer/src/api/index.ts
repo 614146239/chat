@@ -15,8 +15,6 @@ export interface CustomAxiosRequestConfig extends InternalAxiosRequestConfig {
   // loading?: boolean
   cancel?: boolean
 }
-console.log(import.meta.env)
-
 const config = {
   baseURL: import.meta.env.VITE_BASE_API
   // 设置超时时间

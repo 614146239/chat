@@ -15,6 +15,8 @@ function useDrag(node?: HTMLElement): (() => void) | undefined {
   }
   const width = window.outerWidth
   const height = window.outerHeight
+  // console.log({ width, height })
+
   const handleMouseMove = (event: MouseEvent) => {
     if (dragging) {
       const newCoords = { x: event.screenX, y: event.screenY }

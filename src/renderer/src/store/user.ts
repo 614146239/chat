@@ -61,11 +61,11 @@ export const useUserStore = defineStore('user', {
       this.userGroup = [...groupList]
     }
   },
-  // persist: true
-  persist: {
-    // storage: sessionStorage
-    paths: ['userInfo', 'token', 'userGroup', 'groupAndUser']
-  }
+  persist: true
+  // persist: {
+  //   // storage: sessionStorage
+  //   paths: ['userInfo', 'token', 'userGroup', 'groupAndUser']
+  // }
 })
 
 const splitUser = (groupAndUser) => {

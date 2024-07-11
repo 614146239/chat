@@ -11,7 +11,9 @@ import * as ElementPlusIconsVue from '@element-plus/icons-vue'
 for (const [key, component] of Object.entries(ElementPlusIconsVue)) {
   app.component(key, component)
 }
+// 自定义指令
+import directive from './directive/index'
 
-app.use(router)
-app.use(pinia)
+app.use(router).use(pinia).use(directive)
+
 app.mount('#app')

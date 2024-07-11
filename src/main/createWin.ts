@@ -4,7 +4,8 @@ import {
   dialog,
   ipcMain,
   nativeImage,
-  shell
+  shell,
+  Notification
 } from 'electron'
 import { createTray } from './tray'
 import menu from './menu'
@@ -127,6 +128,7 @@ class Window {
     win.setIcon(icon)
     return win
   }
+
   listen() {
     // 录制
     ipcMain.handle('recording', screenCapturer)
@@ -176,7 +178,7 @@ class Window {
     // 窗口全屏
     ipcMain.on('setFullScreen', (_, isFullScreen) => {
       const win = BrowserWindow.getFocusedWindow()
-      win?.setAspectRatio(0)
+      // win?.setAspectRatio(0)
       win?.setFullScreen(isFullScreen)
     })
     // 最小化任务栏

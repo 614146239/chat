@@ -1,6 +1,6 @@
 <template>
   <div class="main">
-    <menuAside></menuAside>
+    <menuAside ref="menu"></menuAside>
     <router-view></router-view>
     <windowsetting is-change-shape is-mini-mize is-max-imize class="windowConfig"></windowsetting>
   </div>

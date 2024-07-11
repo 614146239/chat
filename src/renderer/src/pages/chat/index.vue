@@ -23,23 +23,23 @@
       </el-page-header>
     </header>
     <div class="border"></div>
-    <div class="messageList">
-      <div v-for="(item, index) in messageList" :key="index" :class="item.class">
-        <template v-if="item.class == 'opponentMsg'">
-          <div class="avatar">
-            <el-avatar :size="40" :src="item.userInfo.avatar" />
-          </div>
-          <p>{{ item.msg }}</p>
-        </template>
-        <template v-else>
-          <p>{{ item.msg }}</p>
-          <div class="avatar">
-            <el-avatar :size="40" :src="item.userInfo.avatar" />
-          </div>
-        </template>
-      </div>
+    <div class="messageList" v-scrollBottom ref="messageBox">
+      <div v-for="(item, index) in messageList" :key="index">
+        <div v-if="useTime(item.time)" class="time">{{ useTime(item.time) }}</div>
 
-      <div class="time">时间</div>
+        <div :class="item.class" v-if="item.class == 'opponentMsg'">
+          <div class="avatar">
+            <el-avatar :size="40" :src="item.userInfo.avatar" />
+          </div>
+          <p>{{ item.msg }}</p>
+        </div>
+        <div :class="item.class" v-else>
+          <p>{{ item.msg }}</p>
+          <div class="avatar">
+            <el-avatar :size="40" :src="item.userInfo.avatar" />
+          </div>
+        </div>
+      </div>
     </div>
     <div class="border"></div>
     <div class="chatSetting">
@@ -52,7 +52,7 @@
     </div>
     <div class="inputChat">
       <div class="writeMsg">
-        <el-input v-model="msg" autofocus autosize type="textarea" @keydown.enter="send" />
+        <el-input v-model.trim="msg" autofocus autosize type="textarea" @keydown.enter="send" />
       </div>
       <div class="submit" @click="send"><el-button type="primary">发送</el-button></div>
     </div>
@@ -94,6 +94,7 @@ import { useUserStore } from '../../store/user'
 import { createWindow } from '../../store/createWindow'
 import { chatUpload } from '../../api/modules/upload'
 import { UploadUserFile } from 'element-plus'
+import useTime from '../../hooks/useTime'
 const win = createWindow()
 const route = useRoute()
 const userStore = useUserStore()
@@ -103,9 +104,12 @@ const userInfo = userStore.userInfo
 const friendInfo = ref(userStore.findChatUser(friendId.value))
 const headerRef = ref()
 const msg = ref('')
-// const messageList = ref([])
-const messageList = ref(friendInfo.message ? friendInfo.message : reactive([]))
-console.log(messageList)
+
+const messageList: any = ref(friendInfo.message ? friendInfo.message : reactive([]))
+console.log(messageList.value)
+console.log(friendInfo.message)
+
+const messageBox = ref()
 
 const isSendFile = ref(false)
 userStore.clearMsgTotal(friendId.value)
@@ -125,6 +129,12 @@ socket.connect()
 socket.on('receive_message', (msg) => {
   friendInfo.value = userStore.findChatUser(friendId.value)
   messageList.value = friendInfo.value.message
+  // 消息不再提示
+  userStore.chatList.forEach((user) => {
+    if (user.id == friendId.value) {
+      user.msgTotal = 0
+    }
+  })
 })
 let fileInfo = reactive({
   size: '',
@@ -154,7 +164,8 @@ const sendFile = () => {
   chatUpload(formData)
 }
 const send = async (): Promise<void> => {
-  if (msg.value == '') return
+  if (!msg.value) return
+  const time = new Date().toLocaleString()
 
   socket.emit(
     'send_message',
@@ -162,18 +173,28 @@ const send = async (): Promise<void> => {
     JSON.stringify({
       class: 'opponentMsg',
       msg: msg.value,
+      time: time,
       userInfo: toRaw(userInfo)
     })
   )
-  messageList.value = [
-    ...messageList.value,
-    {
-      class: 'selfMsg',
-      msg: msg.value,
-      userInfo: userInfo
-    }
-  ]
-  msg.value = ''
+  // messageList.value = [
+  //   ...messageList.value,
+  //   {
+  //     class: 'selfMsg',
+  //     msg: msg.value,
+  //     time: time,
+  //     userInfo: userInfo
+  //   }
+  // ]
+  messageList.value.push({
+    class: 'selfMsg',
+    msg: msg.value,
+    time: time,
+    userInfo: userInfo
+  })
+  console.log(messageList.value)
+
+  msg.value = null
 }
 const videoCamera = () => {
   socket.emit('call', room.value)
@@ -191,3 +212,5 @@ onBeforeUnmount(() => {
 <style scoped lang="less">
 @import url(./index.less);
 </style>
+
+<!-- 发送消息，接收消息，达到最底部 -->
