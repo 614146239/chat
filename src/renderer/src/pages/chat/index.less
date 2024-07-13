@@ -96,6 +96,10 @@ header {
       word-wrap: break-word;
       word-break: break-all;
       border-radius: 10px;
+      -webkit-user-select: text;
+      -moz-user-select: text;
+      -ms-user-select: text;
+      user-select: text;
     }
     .avatar {
       margin-right: 10px;
@@ -124,27 +128,14 @@ header {
       word-wrap: break-word;
       word-break: break-all;
       border-radius: 10px;
+      -webkit-user-select: text;
+      -moz-user-select: text;
+      -ms-user-select: text;
+      user-select: text;
     }
   }
 }
-.upload {
-  width: 100%;
-  height: 100%;
-  position: absolute;
-  top: 0;
-  // display: none;
-  // z-index: -1;
-  :deep(.upload-context) {
-    height: 100%;
-  }
-  :deep(.el-upload) {
-    height: 100%;
-  }
-  :deep(.el-upload-dragger) {
-    background-color: rgb(242, 242, 242);
-    height: 100%;
-  }
-}
+
 .chatSetting {
   width: 100%;
   display: flex;
@@ -165,37 +156,11 @@ header {
   .writeMsg {
     width: 100%;
     height: 100%;
-    .el-textarea {
+    .chatBox {
+      width: 100%;
       height: 100%;
-      height: 100%;
-
-      background-color: rgb(242, 242, 242);
-      :deep(.el-textarea__inner) {
-        height: 100% !important;
-        background-color: rgb(242, 242, 242);
-        font-size: 15px;
-        color: #000;
-        outline: none;
-        box-shadow: none !important;
-        &::-webkit-hover {
-          box-shadow: none !important;
-          outline: none;
-        }
-        &::-webkit-scrollbar {
-          width: 5px;
-          height: 100%;
-          background: rgb(242, 242, 242); // 滑块颜色
-          border-radius: 5px; // 滑块圆角
-        }
-        &::-webkit-scrollbar-thumb {
-          height: 10px;
-          border-radius: 5px; // 滑块圆角
-          background-color: rgb(167, 159, 159);
-        }
-        &:focus {
-          box-shadow: none;
-        }
-      }
+      padding: 0px 10px 10px;
+      outline: none;
     }
   }
   .submit {

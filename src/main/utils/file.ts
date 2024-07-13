@@ -24,13 +24,13 @@ export const getFile = (filePath) => {
     const fileName = path.basename(filePath) // 文件名（不包含路径）
     const extension = path.extname(filePath) // 文件扩展名
     // 同步读取文件
-    const data = fs.readFileSync(filePath, 'binary')
+    const data = fs.readFileSync(filePath)
 
-    // const data = fs.createReadStream(filePath)
     return {
       size: fileSizeInBytes,
       fileName: fileName,
       extension: extension,
+      path: filePath,
       file: data
     }
     // 在这里处理文件内容

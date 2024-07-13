@@ -26,15 +26,16 @@
     <div class="messageList" v-scrollBottom ref="messageBox">
       <div v-for="(item, index) in messageList" :key="index">
         <div v-if="useTime(item.time)" class="time">{{ useTime(item.time) }}</div>
-
+        <h1>111</h1>
         <div :class="item.class" v-if="item.class == 'opponentMsg'">
           <div class="avatar">
             <el-avatar :size="40" :src="item.userInfo.avatar" />
           </div>
-          <p>{{ item.msg }}</p>
+          <p v-html="item.msg"></p>
         </div>
         <div :class="item.class" v-else>
-          <p>{{ item.msg }}</p>
+          <!-- <p>{{ item.msg }}</p> -->
+          <p v-html="item.msg"></p>
           <div class="avatar">
             <el-avatar :size="40" :src="item.userInfo.avatar" />
           </div>
@@ -50,9 +51,16 @@
         <el-icon :size="22"><Picture /></el-icon>
       </div>
     </div>
-    <div class="inputChat">
+    <div class="inputChat" ref="inputRef">
       <div class="writeMsg">
-        <el-input v-model.trim="msg" autofocus autosize type="textarea" @keydown.enter="send" />
+        <!-- <el-input v-model.trim="msg" autofocus autosize type="textarea" @keydown.enter="send" /> -->
+        <Chatbox
+          class="chatBox"
+          ref="inputChat"
+          focus
+          v-model.trim="msg"
+          @keydown.enter="send"
+        ></Chatbox>
       </div>
       <div class="submit" @click="send"><el-button type="primary">发送</el-button></div>
     </div>
@@ -95,6 +103,7 @@ import { createWindow } from '../../store/createWindow'
 import { chatUpload } from '../../api/modules/upload'
 import { UploadUserFile } from 'element-plus'
 import useTime from '../../hooks/useTime'
+import Chatbox from '../../components/chatBox/index.vue'
 const win = createWindow()
 const route = useRoute()
 const userStore = useUserStore()
@@ -104,6 +113,7 @@ const userInfo = userStore.userInfo
 const friendInfo = ref(userStore.findChatUser(friendId.value))
 const headerRef = ref()
 const msg = ref('')
+const inputChat = ref(null)
 
 const messageList: any = ref(friendInfo.message ? friendInfo.message : reactive([]))
 console.log(messageList.value)
@@ -140,6 +150,7 @@ let fileInfo = reactive({
   size: '',
   fileName: '',
   extension: '',
+  path: '',
   file: ''
 })
 // const beforeAvatarUpload = (file) => {
@@ -154,7 +165,7 @@ const openFolder = async () => {
   console.log(fileInfo)
 }
 const sendFile = () => {
-  const newFile = new File([fileInfo.file], fileInfo.fileName, { type: 'application/octet-stream' })
+  const newFile = new File([fileInfo.file], fileInfo.fileName)
 
   const formData = new FormData()
   // formData.append('file', new Blob([fileInfo.file]))
@@ -177,32 +188,40 @@ const send = async (): Promise<void> => {
       userInfo: toRaw(userInfo)
     })
   )
-  // messageList.value = [
-  //   ...messageList.value,
-  //   {
-  //     class: 'selfMsg',
-  //     msg: msg.value,
-  //     time: time,
-  //     userInfo: userInfo
-  //   }
-  // ]
   messageList.value.push({
     class: 'selfMsg',
     msg: msg.value,
     time: time,
     userInfo: userInfo
   })
-  console.log(messageList.value)
 
-  msg.value = null
+  inputChat.value.setInputValue(null)
 }
 const videoCamera = () => {
   socket.emit('call', room.value)
   win.videoChat(room.value as string, true)
 }
 let clearDrag
+const inputRef = ref()
 onMounted(() => {
   clearDrag = useDrag(headerRef.value)
+  //
+
+  inputRef.value.addEventListener('drop', (e) => {
+    e.preventDefault()
+    e.stopPropagation()
+
+    for (const f of e.dataTransfer.files) {
+      console.log('File(s) you dragged here: ', f)
+      const formData = new FormData()
+      formData.append('file', f)
+      chatUpload(formData)
+    }
+  })
+  inputRef.value.addEventListener('dragover', (e) => {
+    e.preventDefault()
+    e.stopPropagation()
+  })
 })
 onBeforeUnmount(() => {
   clearDrag()

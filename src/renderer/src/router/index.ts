@@ -32,6 +32,10 @@ const routes: Array<RouteRecordRaw> = [
             path: '/chat',
             name: 'chat',
             component: () => import('../pages/chat/index.vue')
+          },
+          {
+            path: '*',
+            component: () => import('../pages/chat/index.vue')
           }
         ]
       },
@@ -79,6 +83,9 @@ const routes: Array<RouteRecordRaw> = [
     name: 'videoChat',
     component: () => import('../pages/videoChat/index.vue')
   }
+  // {
+  //   path: '*'
+  // }
   // {
   //   path: '/setting',
   //   name: 'setting',

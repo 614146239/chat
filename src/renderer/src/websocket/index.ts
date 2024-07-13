@@ -41,7 +41,7 @@ socket.on('receive_message', (msg) => {
     // timeoutType: 'default'
     icon: fly
   }).onclick = () => {
-    // console.log(1)
+    //  加入显示窗口
     router.push({
       name: `chat`,
       query: {
